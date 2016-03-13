@@ -1,0 +1,328 @@
+<!DOCTYPE>
+<html lang="en">
+<head>
+	<title>Pacman Demo</title>
+	<meta charset = "utf-8">
+	<script src= 'http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+	<style type="text/css">
+
+		body{
+			background-color: black;
+			margin: 0px;
+		}
+		div.row div{
+			width: 20px;
+			height: 20px;
+			display: inline-block;
+		}
+		div.brick{
+			background-color: blue;
+		}
+		div.coin{
+			background: url('img/dot.png');
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: 50%;
+		}
+		div.empty{
+
+		}
+		div#pacman{
+			background: url('img/pacman_right.gif');
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: cover;
+			width: 20px;
+			height: 20px;
+			position: absolute;
+		}
+		div#score{
+			border: 1px solid white;
+			width: 30px;
+			height: 20px;
+			color: white;
+			padding: 7px;
+			text-align: center;
+			position: absolute;
+			top: 10px;
+			left: 570px;
+		}
+		div#red_ghost{
+			background: url('img/red_ghost.png');
+			width: 20px;
+			height: 20px;
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: cover;
+			position: absolute;
+		}
+		div#pink_ghost{
+			background: url('img/pink_ghost.png');
+			width: 20px;
+			height: 20px;
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: cover;
+			position: absolute;
+		}
+		div#green_ghost{
+			background: url('img/green_ghost.png');
+			width: 20px;
+			height: 20px;
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: cover;
+			position: absolute;
+		}
+		div#orange_ghost{
+			background: url('img/orange_ghost.png');
+			width: 20px;
+			height: 20px;
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: cover;
+			position: absolute;
+		}
+	</style>
+</head>
+<body>
+	<div id='container'>
+		<div id='world'></div>
+		<div id='pacman' class='pacman'></div>
+		<div id='score'>0</div>
+		<div id='red_ghost' class='ghost'></div>
+		<div id='pink_ghost' class='ghost'></div>
+		<div id='green_ghost' class='ghost'></div>
+		<div id='orange_ghost' class='ghost'></div>
+	</div>
+	<script>
+
+	var world = [
+		[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+		[2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2],
+		[2,1,2,2,2,2,1,2,2,2,2,1,2,1,2,2,2,2,1,2,2,2,2,1,2],
+		[2,1,2,2,2,2,1,2,2,2,2,1,2,1,2,2,2,2,1,2,2,2,2,1,2],
+		[2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2],
+		[2,1,2,2,2,2,1,2,1,2,2,2,2,2,2,2,1,2,1,2,2,2,2,1,2],
+		[2,1,1,1,1,1,1,2,1,2,2,2,2,2,2,2,1,2,1,1,1,1,1,1,2],
+		[2,2,2,2,2,2,1,2,1,1,1,1,2,1,1,1,1,2,1,2,2,2,2,2,2],
+		[0,0,0,0,0,2,1,2,2,2,2,0,2,0,2,2,2,2,1,2,0,0,0,0,0],
+		[0,0,0,0,0,2,1,2,0,0,0,0,0,0,0,0,0,2,1,2,0,0,0,0,0],
+		[2,2,2,2,2,2,1,2,0,0,2,2,2,2,2,0,0,2,1,2,2,2,2,2,2],
+		[0,0,0,0,0,0,1,0,0,0,2,0,0,0,2,0,0,0,1,0,0,0,0,0,0],
+		[2,2,2,2,2,2,1,2,0,0,2,2,2,2,2,0,0,2,1,2,2,2,2,2,2],
+		[0,0,0,0,0,2,1,2,0,0,0,0,0,0,0,0,0,2,1,2,0,0,0,0,0],
+		[0,0,0,0,0,2,1,2,0,2,2,2,2,2,2,2,0,2,1,2,0,0,0,0,0],
+		[2,2,2,2,2,2,1,2,0,2,2,2,2,2,2,2,0,2,1,2,2,2,2,2,2],
+		[2,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,2],
+		[2,1,2,2,1,2,2,2,2,2,2,1,2,1,2,2,2,2,2,2,1,2,2,1,2],
+		[2,1,1,2,1,2,1,1,1,1,1,1,0,1,1,1,1,1,1,2,1,2,1,1,2],
+		[2,2,1,2,1,2,1,2,2,1,2,2,2,2,2,1,2,2,1,2,1,2,1,2,2],
+		[2,1,1,1,1,1,1,2,2,1,1,1,2,1,1,1,2,2,1,1,1,1,1,1,2],
+		[2,1,2,2,2,2,2,2,2,2,2,1,2,1,2,2,2,2,2,2,2,2,2,1,2],
+		[2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2],
+		[2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2],
+	];
+
+	var score = 0;
+
+	var pacman = {
+		x: 12,
+		y: 18
+	};
+
+	var redGhost = {
+		x: 12,
+		y: 8
+	};
+
+	var pinkGhost = {
+		x: 12,
+		y: 11
+	};
+
+	var greenGhost = {
+		x: 11,
+		y: 11
+	};
+
+	var orangeGhost = {
+		x: 13,
+		y: 11
+	}
+
+	function displayWorld(){
+		var output = '';
+
+		for(var i=0; i<world.length; i++){
+			output += "\n<div class='row'>\n";
+			for(var j=0; j<world[i].length; j++){
+				if(world[i][j] == 2){
+					output += "<div class='brick'></div>";
+				}
+				else if(world[i][j] == 1){
+					output += "<div class='coin'></div>";
+				}
+				if(world[i][j] == 0){
+					output += "<div class='empty'></div>";
+				}
+			}
+			output += "\n</div>";
+		}
+		// console.log(output)
+		document.getElementById('world').innerHTML = output;
+	}
+	function displayPacman(){
+		document.getElementById('pacman').style.top = pacman.y*20+"px";
+		document.getElementById('pacman').style.left = pacman.x*20+"px";
+	}
+	function displayGhost(){
+		document.getElementById('red_ghost').style.top = redGhost.y*20+"px";
+		document.getElementById('red_ghost').style.left = redGhost.x*20+"px";
+		document.getElementById('pink_ghost').style.top = pinkGhost.y*20+"px";
+		document.getElementById('pink_ghost').style.left = pinkGhost.x*20+"px";
+		document.getElementById('green_ghost').style.top = greenGhost.y*20+"px";
+		document.getElementById('green_ghost').style.left = greenGhost.x*20+"px";
+		document.getElementById('orange_ghost').style.top = orangeGhost.y*20+"px";	
+		document.getElementById('orange_ghost').style.left = orangeGhost.x*20+"px";
+	}
+	function displayScore(){
+		document.getElementById('score').innerHTML = score;
+	}
+
+	function addPacmanStyling(){ //Is there a better way of doing this?
+		$('#pacman').css({"background-repeat":"no-repeat","background-position":"center","background-size":"cover","width":"20px"});
+	}
+	function wrapRightBoundary(){
+		if(pacman.x == 25){
+			pacman.x = 0;
+		}
+	}
+	function wrapLeftBoundary(){
+		if(pacman.x == -1){
+			pacman.x = 24;
+		}
+	}
+	function redGhostChase(){//trying to get to pacman
+		//Pacman is above ghost. Ghost moves up.
+		var max = 0
+		// Store the max
+		// 
+		if(pacman.y < redGhost.y && world[redGhost.y-1][redGhost.x] != 2){
+			redGhost.y --;
+		}
+		//Pacman is below ghost. Ghost moves down.
+		else if(pacman.y > redGhost.y && world[redGhost.y+1][redGhost.x] != 2){
+			redGhost.y ++;
+		}
+		//Pacman is right of ghost. Ghost moves left.
+		else if(pacman.x < redGhost.x && world[redGhost.y][redGhost.x-1] != 2){
+			redGhost.x --;
+		}
+		//Pacman is left ghost. Ghost moves right.
+		else if(pacman.x > redGhost.x && world[redGhost.y][redGhost.x+1] != 2){
+			redGhost.x ++;
+		}
+		//Try one path then the other
+
+	}
+
+	var marked = []
+	var nodes = [[red_ghost.x,red_ghost.y]]
+	function pathfinder(){
+		for(node in nodes){//for each node in nodes
+			if (!(marked.indexOf(node[nodes]) >= 0)){//If the node is not marked
+				var up = [nodes[node].y-1,red_ghost.x];
+				var down = [red_ghost.y+1,red_ghost.x];
+				var left = [red_ghost.y,red_ghost.x-1];
+				var right = [red_ghost.y,red_ghost.x+1];
+				directions = [up, down, left, right];
+				var count = 0;
+				for(direction in directions){
+					if(world[direction[0][1]] != 2 && (!(marked.indexOf(directions[direction]) >= 0))){
+						nodes.push(directions[direction]);
+						console.log(marked.indexOf(directions[direction]))
+					} 
+					else{
+						count += 1;
+					}
+				}
+				if(count == 3){
+					marked.push(nodes[node]);
+					nodes.splice(indexOf(nodes[node]),1);
+				}
+			}
+		}
+	}
+	// function pathfinder(nodes){
+	// 	if(nodes === undefined){
+	// 		nodes = []
+	// 	}
+	// 	var inital = [red_ghost.x,red_ghost.y];
+	// 	var up = [red_ghost.y-1,red_ghost.x];
+	// 	var down = [red_ghost.y+1,red_ghost.x];
+	// 	var left = [red_ghost.y,red_ghost.x-1];
+	// 	var right = [red_ghost.y,red_ghost.x+1];
+	// 	directions = [up, down, left, right];
+	// 	for(direction in directions){
+	// 		if(world[direction[0][1]] != 2){
+	// 			nodes.push(directions[direction])
+	// 		}
+	// 	}
+	// 	return nodes
+	// }
+
+
+	// setInterval(function(){pathfinder([pacman.x,pacman.y])},2000);
+	//Try one path and then other
+	//Try up first then try down 
+		// which ever has the least amount of hops do that
+	displayWorld();
+	displayPacman();
+	redGhostChase();
+	displayGhost();
+	displayScore();
+
+
+
+	setInterval(function(){ 
+		redGhostChase();
+		displayGhost() }, 2000);
+
+	document.onkeydown = function(e){
+		if(e.keyCode == 37 && world[pacman.y][pacman.x-1] != 2){
+			$('#pacman').css("background","url('img/pacman_left.gif')");
+			addPacmanStyling();
+			pacman.x --;
+			wrapLeftBoundary();
+		}
+		else if(e.keyCode == 39 && world[pacman.y][pacman.x+1] != 2){
+			$('#pacman').css("background","url('img/pacman_right.gif')");
+			addPacmanStyling();
+			pacman.x ++;
+			wrapRightBoundary();
+		}
+		else if(e.keyCode == 38 && world[pacman.y-1][pacman.x] != 2){
+			$('#pacman').css("background","url('img/pacman_up.gif')");
+			addPacmanStyling()
+			pacman.y --;
+		}
+		else if(e.keyCode == 40 && world[pacman.y+1][pacman.x] != 2){
+			$('#pacman').css("background","url('img/pacman_down.gif')");
+			addPacmanStyling()
+			pacman.y ++;
+		}
+
+		if(world[pacman.y][pacman.x] == 1){
+			world[pacman.y][pacman.x] = 0;
+			score += 10;
+			displayWorld();
+			displayScore();
+		}
+		// console.log(e.keyCode)
+		displayPacman()
+	}
+	</script>
+
+</body>
+</html>
